@@ -1,14 +1,12 @@
-const checkIdValidity = (req, res, next) => {
-  if (!isPositiveInteger(req.params.id)) {
-    return res.status(400).json({
-      message: 'the hero id should be interger'
-    })
-  }
-  next();
-};
+const isNormalInteger = (str) => /^\+?(0|[1-9]\d*)$/.test(str);
 
-const isPositiveInteger = (x) => {
-  return Number.isInteger(x) && x > 0
-}
+const checkIdValidity = (req, res, next) => {
+  if (!isNormalInteger(req.params.id)) {
+    return res.status(400).json({
+      message: 'the hero id should be a positive interger',
+    });
+  }
+  return next();
+};
 
 module.exports = checkIdValidity;
