@@ -8,16 +8,23 @@ const listHeroes = async (req, res, next) => {
   const { name, password } = req.headers;
   if (name && password) {
     try {
-      const response = await axios.post(heroAuthUrl, {
-        name,
-        password
-      }, {
-        'Content-Type': 'application/json'
+      const authBody = { name, password };
+      const response = await axios.post(heroAuthUrl, authBody, {
+        'Content-Type': 'application/json',
       });
       if (response.status === 200) {
+        // success auth
+        const heroListRes = await axios.get(heroListUrl);
+        for (let i = 0; i < heroListRes.data.length; i += 1) {
+          const eachHeroInfo = heroListRes.data[i];
+          // in order to ensure the order of id, ignore eslint hint here
+          // eslint-disable-next-line no-await-in-loop
+          const heroProfileRes = await axios.get(`${heroListUrl}/${eachHeroInfo.id}/profile`);
+          eachHeroInfo.profile = heroProfileRes.data;
+        }
         return res.json({
-          message: 'auth successful'
-        })
+          heroes: heroListRes.data,
+        });
       }
     } catch (error) {
       throw new Error('auth server error');
@@ -25,7 +32,7 @@ const listHeroes = async (req, res, next) => {
   }
   try {
     const response = await axios.get(heroListUrl);
-    res.status(200).json({
+    return res.status(200).json({
       heroes: response.data,
     });
   } catch (error) {
@@ -34,8 +41,25 @@ const listHeroes = async (req, res, next) => {
 };
 
 const getSingleHero = async (req, res, next) => {
-  // should add logic to block invalid id
   const heroId = req.params.id;
+  const { name, password } = req.headers;
+  if (name && password) {
+    try {
+      const authBody = { name, password };
+      const response = await axios.post(heroAuthUrl, authBody, {
+        'Content-Type': 'application/json',
+      });
+      if (response.status === 200) {
+        // success auth
+        const heroDetailRes = await axios.get(`${heroListUrl}/${heroId}`);
+        const heroProfileRes = await axios.get(`${heroListUrl}/${heroDetailRes.data.id}/profile`);
+        heroDetailRes.data.profile = heroProfileRes.data;
+        return res.json(heroDetailRes.data);
+      }
+    } catch (error) {
+      throw new Error('auth server error');
+    }
+  }
   try {
     const response = await axios.get(`${heroListUrl}/${heroId}`);
     res.status(200).json(response.data);
