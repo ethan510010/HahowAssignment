@@ -1,4 +1,4 @@
-const isNormalInteger = (str) => /^\+?(0|[1-9]\d*)$/.test(str);
+const isNormalInteger = (str) => /^\+?([1-9]\d*)$/.test(str);
 
 const checkIdValidity = (req, res, next) => {
   if (!isNormalInteger(req.params.id)) {
