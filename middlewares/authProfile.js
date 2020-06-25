@@ -4,13 +4,15 @@ require('dotenv').config();
 const { heroListUrl, heroAuthUrl } = require('../common/urlProducer');
 const handler = require('../common/handler');
 
+const defaultReqHeader = {
+  'Content-Type': 'application/json',
+};
+
 const getAuthHeroesList = async (req, res, next) => {
   const { name, password } = req.headers;
   if (name && password) {
     const authBody = { name, password };
-    const [authRes, authError] = await handler(axios.post(heroAuthUrl, authBody, {
-      'Content-Type': 'application/json',
-    }));
+    const [authRes, authError] = await handler(axios.post(heroAuthUrl, authBody, defaultReqHeader));
     if (authError) {
       return res.status(400).json({
         message: 'Please check hahow & password are correct.',
@@ -49,9 +51,7 @@ const getAuthSingleHero = async (req, res, next) => {
   const { name, password } = req.headers;
   if (name && password) {
     const authBody = { name, password };
-    const [authRes, authError] = await handler(axios.post(heroAuthUrl, authBody, {
-      'Content-Type': 'application/json',
-    }));
+    const [authRes, authError] = await handler(axios.post(heroAuthUrl, authBody, defaultReqHeader));
     if (authError) {
       return res.status(400).json({
         message: 'Please check hahow & password are correct.',
