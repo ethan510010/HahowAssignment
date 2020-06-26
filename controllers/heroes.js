@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const { heroListUrl } = require('../common/urlProducer');
 const handler = require('../common/handler');
+const { getNoAuthHeroDetail, saveNoAuthHeroDetail } = require('../models/hero');
 
 const listHeroes = async (req, res, next) => {
   const [heroesInfoRes, error] = await handler(axios.get(heroListUrl));
@@ -29,6 +30,11 @@ const listHeroes = async (req, res, next) => {
 
 const getSingleHero = async (req, res, next) => {
   const heroId = req.params.id;
+  // check cache first
+  const [heroCacheInfo, cacheError] = await handler(getNoAuthHeroDetail(heroId));
+  if (!cacheError && heroCacheInfo) {
+    return res.json(JSON.parse(heroCacheInfo));
+  }
   const [heroDetailRes, error] = await handler(axios.get(`${heroListUrl}/${heroId}`));
   if (error) {
     return res.status(400).json({
@@ -40,6 +46,7 @@ const getSingleHero = async (req, res, next) => {
       message: 'server error, please try it again',
     });
   }
+  saveNoAuthHeroDetail(heroId, JSON.stringify(heroDetailRes.data));
   return res.status(200).json(heroDetailRes.data);
 };
 

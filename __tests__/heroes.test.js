@@ -1,6 +1,6 @@
 const supertest = require('supertest');
 const app = require('../app');
-
+const { closeInstance } = require('../db/redis');
 const request = supertest(app);
 
 /*
@@ -67,3 +67,8 @@ it('test auth single hero api', async (done) => {
   }
   done();
 }, 9000);
+
+afterAll(async (done) => {
+  closeInstance();
+  done();
+});

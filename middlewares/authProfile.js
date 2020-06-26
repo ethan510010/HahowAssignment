@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const { heroListUrl, heroAuthUrl } = require('../common/urlProducer');
 const handler = require('../common/handler');
+const { getAuthHeroDetail, saveAuthHeroDetail } = require('../models/hero');
 
 const defaultReqHeader = {
   'Content-Type': 'application/json',
@@ -59,6 +60,11 @@ const getAuthSingleHero = async (req, res, next) => {
     }
     // success auth
     if (authRes.status === 200) {
+      // check cache first
+      const [heroAuthInfo, cacheError] = await handler(getAuthHeroDetail(heroId));
+      if (!cacheError && heroAuthInfo) {
+        return res.json(JSON.parse(heroAuthInfo));
+      }
       const [heroDetailRes, getHeroDetailError] = await handler(axios.get(`${heroListUrl}/${heroId}`));
       if (getHeroDetailError) {
         return res.status(400).json({
@@ -77,6 +83,7 @@ const getAuthSingleHero = async (req, res, next) => {
         });
       }
       heroDetailRes.data.profile = heroProfileRes.data;
+      saveAuthHeroDetail(heroId, JSON.stringify(heroDetailRes.data));
       return res.json(heroDetailRes.data);
     }
   }
