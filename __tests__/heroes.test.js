@@ -1,6 +1,7 @@
 const supertest = require('supertest');
 const app = require('../app');
 const { closeInstance } = require('../db/redis');
+
 const request = supertest(app);
 
 /*
