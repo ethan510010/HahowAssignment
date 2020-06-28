@@ -5,13 +5,13 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       # if run docker on local, comment /etc/ssl:/etc/ssl
-      # - /etc/ssl:/etc/ssl
+      - /etc/ssl:/etc/ssl
     depends_on:
       - node
     ports:
       - 80:80
       # if run docker on local, comment 443:443
-      # - 443:443
+      - 443:443
   node:
     build: .
   redis-server:
