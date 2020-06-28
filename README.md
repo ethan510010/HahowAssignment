@@ -29,10 +29,10 @@ redisPort=...
 ```
 ### Local start
 1. **modify docker-compose.yaml**: 
-comment out below code
-`- /etc/ssl:/etc/ssl`
+comment out below code  
+`- /etc/ssl:/etc/ssl`  
 `- 443:443`
-2. **modify nginx/virtual.conf**:
+2. **modify nginx/virtual.conf**:  
 ex:
 ```
 server {
@@ -56,11 +56,11 @@ server {
 }
 ```
 3. **Run docker-compose.yaml**:
-Remember start docker first.
+Remember start docker first.  
 `docker-compose up -d --build`
 
-4. **Now you can call local api**: 
-http://localhost/heroes 
+4. **Now you can call local api**:   
+http://localhost/heroes  
 http://localhost/heroes/:heroId
 
 ### Run API test
